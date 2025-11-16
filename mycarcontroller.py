@@ -30,8 +30,8 @@ while True:
     try: # look for a torque message
         raw = sub.recv(flags=zmq.NOBLOCK)
 
-        with example_capnp.Status.from_bytes(raw) as torque_msg:
-            val = torque_msg.value
+        with example_capnp.Event.from_bytes(raw) as torque_msg:
+            val = torque_msg.carControl.actuators.torque
             effort = abs(int((val / 12 * 250)))
             dir = 2 if val > 0 else 1
             effort = max(0, min(110, effort))
