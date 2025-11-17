@@ -8,6 +8,9 @@ import class_transform
 import cv2
 import zmq
 import capnp
+
+MODEL_INSTANCES = 2
+
 class ModelRunner:
   def __init__(self):
     self.drivingPolicy = ort.InferenceSession("external/openpilot/selfdrive/modeld/models/driving_policy.onnx")
@@ -31,7 +34,7 @@ class ModelRunner:
     self.visionModelInputs["img"][0, 6:12, :, :] = newFrame   
     self.visionModelInputs["big_img"] = self.visionModelInputs["img"] 
     self.policyModelInputs['desire'][0] = 0
-    self.policyModelInputs['traffic_convention'][0] = [0.0, 1.0]  # RHD
+    self.policyModelInputs['traffic_convention'][0] = [1.0, 0.0]  # RHD
     self.policyModelInputs['lateral_control_params'][0] = [vEgo, actuatorDelay]
     self.policyModelInputs['prev_desired_curv'][0, :-1] = self.policyModelInputs['prev_desired_curv'][0, 1:] # shift left
     self.policyModelInputs['prev_desired_curv'][0, -1,:] = self.policyModelOutputs[0][5880:5882][0] # model only uses last value now
@@ -42,8 +45,9 @@ class ModelRunner:
     self.policyModelOutputs[:] = self.drivingPolicy.run(None,self.policyModelInputs)[0]
 
 client = FrameClient()  # attach to shared memory
-models = [ModelRunner(),ModelRunner()]
-period = 1/(len(models)*5)
+
+models = [ModelRunner() for _ in range(MODEL_INSTANCES)]
+period = 1/(MODEL_INSTANCES*5)
 
 
 H = class_transform.H # i dont want to have to change the same transform everywhere
@@ -75,5 +79,5 @@ while True:
     sleep_time = period - elapsed
     if sleep_time > 0:
       time.sleep(sleep_time)
-    print(f"{1/(time.perf_counter() - start):.2f} Hz\r", end="")
+    # print(f"{1/(time.perf_counter() - start):.2f} Hz\r", end="")
     # print(vEgo)
