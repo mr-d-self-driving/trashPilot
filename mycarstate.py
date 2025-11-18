@@ -11,9 +11,11 @@ class CarStateListener(can.Listener):
         self.state = state_dict
 
     def on_message_received(self, msg):
+        # print(msg)
         try:
             decoded = self.db.decode_message(msg.arbitration_id, msg.data)
             self.state.update(decoded)
+            # print(msg)
         except Exception:
             pass
 
@@ -27,9 +29,9 @@ db = cantools.database.load_file("assets/samples/hyundai_elantra_2006.dbc")
 
 # Setup CAN bus
 bus = can.interface.Bus(
-    channel='virtual',
-    interface='virtual',
-    can_filters=[{"can_id": 0x440, "can_mask": 0x7FF}]
+    channel='/dev/ttyACM0@115200',
+    interface='slcan',
+    can_filters=[]
 )
 period = 1/20
 start = time.perf_counter()
@@ -45,8 +47,10 @@ while True:
     car_state = msg.init("carState")
 
     car_state.vEgo = latest_state.get("speed", 0.0)
-    car_state.brakePressed = True# latest_state.get("brake", 0)
-    car_state.steeringAngleDeg = latest_state.get("steerangle", 0.0)
+    # print(latest_state.get("BrakeSw1", False))# latest_state.get("brake", 0)
+    car_state.brakePressed = bool(latest_state.get("BrakeSw2", False))# latest_state.get("brake", 0)
+    # print(latest_state.get("measured_angle", 0.0))
+    car_state.steeringAngleDeg = (latest_state.get("measured_angle", 0.0)-337)
 
     pub.send(msg.to_bytes())
     

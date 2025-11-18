@@ -8,6 +8,9 @@ BO_ 496 NEW_MSG_1F0: 8 XXX
  SG_ FL : 23|8@0+ (1,0) [0|15] "" XXX
  SG_ FR : 31|8@0+ (1,0) [0|15] "" XXX
 
+BO_ 512 NEW_MSG_200: 2 XXX
+ SG_ measured_angle : 7|16@0+ (1,0) [0|1023] "" XXX
+ 
 BO_ 672 NEW_MSG_2A0: 8 XXX
  SG_ NEW_SIGNAL_1 : 16|8@1+ (1,0) [0|255] "" XXX
 
@@ -32,7 +35,8 @@ BO_ 1087 NEW_MSG_43F: 8 XXX
 
 BO_ 1088 NEW_MSG_440: 8 XXX
  SG_ speed : 23|8@0+ (1,0) [0|255] "km/h" XXX
- SG_ brake_pressed : 27|2@0+ (1,0) [0|3] "" XXX
+ SG_ BrakeSw1 : 26|1@0+ (1,0) [0|1] "" XXX  
+ SG_ BrakeSw2 : 27|1@0+ (1,0) [0|1] "" XXX   
 
 BO_ 1349 NEW_MSG_545: 4 XXX
 
